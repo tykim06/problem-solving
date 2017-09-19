@@ -1,3 +1,9 @@
+#include <string>
+#include <stack>
+#include <iostream>
+
+using namespace std;
+
 class Solution {
 private:
     int start_num_idx;
@@ -39,7 +45,7 @@ public:
             }
         }
         if(start_num_idx != -1) apply_new_num(s.substr(start_num_idx, s.size() - start_num_idx));
-        
+
         this->last_num = 0;
 
         while(!cal.empty()) {

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /*
  * =====================================================================================
  *
@@ -23,40 +24,27 @@
 using namespace std;
 
 class Solution {
-    private:
-        int count;
-        vector<int> coins;
-        map<int, int> amount_map;
+private:
+    map<int, int> minCoinChangeMap;
+public:
+    int coinChange(vector<int>& coins, int amount) {
+        int pre_amount;
 
-        void makeAmount(int c_amount, int c_coin_idx, int c_count) {
-            if(c_amount < 0) return;
-            if(c_coin_idx < 0) return;
-            if(c_count >= count) return;
-            if(c_amount == 0 and c_count < count) {
-                count = c_count;
-                return;
+        for(int c_amount=1; c_amount<=amount; c_amount++) {
+            minCoinChangeMap[c_amount] = -1;
+
+            for(int coin_idx=0; coin_idx<coins.size(); coin_idx++) {
+                if(c_amount < coins[coin_idx]) continue;
+
+                pre_amount = minCoinChangeMap[c_amount-coins[coin_idx]];
+                if(pre_amount == -1) continue;
+
+                minCoinChangeMap[c_amount] = (minCoinChangeMap[c_amount] == -1) ?
+                    1 + pre_amount :
+                    min(minCoinChangeMap[c_amount], 1+pre_amount);
             }
-
-            makeAmount(c_amount-coins[c_coin_idx], c_coin_idx, c_count+1);
-            makeAmount(c_amount, c_coin_idx-1, c_count);
         }
-    public:
-        int coinChange(vector<int>& coins, int amount) {
-            if(amount == 0) return 0;
 
-            sort(coins.begin(), coins.end());
-            this->coins = coins;
-
-            for(int a=1; a<=amount; a++) {
-                count = amount+1;
-
-                if(amount_map.find(a) == amount_map.end()) {
-
-                }
-                makeAmount(amount-coins.back(), coins.size()-1, 1);
-                makeAmount(amount, coins.size()-2, 0);
-            }
-
-            return count == amount+1 ? -1 : count;
-        }
+        return minCoinChangeMap[amount];
+    }
 };

@@ -1,67 +1,46 @@
 #include <string>
-#include <vector>
+#include <map>
 
 using namespace std;
 
 class Solution {
-private:
-    string minWinStr;
-    std::vector<string> winStrs;
-    std::vector<int> winIdxs;
-    string window;
-
-    void checkMinWinStr(int winIdx, int winLength) {
-        if(minWinStr == "" || minWinStr.size() > winLength) {
-            minWinStr = window.substr(winIdx, winLength);        }
-
-    }
-
-    void eraseCharInWinStrs(int chIdx) {
-        char ch = window[chIdx];
-        size_t findIdx;
-        int winLength;
-
-        for(int j=0; j<winStrs.size(); j++) {
-            winLength = chIdx - winIdxs[j] + 1;
-            if(minWinStr != "" and winLength >= minWinStr.size()) {
-                winStrs.erase(winStrs.begin()+j);
-                winIdxs.erase(winIdxs.begin()+j);
-                j--;
-                continue;
-            }
-
-            findIdx = winStrs[j].find(ch);
-            if(findIdx != string::npos) {
-                winStrs[j].erase(findIdx, 1);
-
-                if(winStrs[j] == "") {
-                    checkMinWinStr(winIdxs[j], winLength);
-                    winStrs.erase(winStrs.begin()+j);
-                    winIdxs.erase(winIdxs.begin()+j);
-                    j--;
-                }
-            }
-        }
-    }
 public:
     string minWindow(string s, string t) {
-        if(s == "") return "";
-        if(t == "") return s.substr(0, 1);
+        map<char, int> targetCount;
+        map<char, bool> targetMatch;
+        
+        for(int i=0; i<t.size(); i++) {
+            targetCount[t[i]]++;
+            targetMatch[t[i]] = true;
+        }
 
-        minWinStr = "";
-        window = s;
+        int startIdx = 0, endIdx = -1;
+        int minIdx = 0, minLen = s.size()+1;
+        int count = t.size();
 
-        for(int i=0; i<s.size(); i++) {
-            if(t.find(s[i]) != string::npos) {
-                if(s.size()-i >= t.size()) {
-                    winStrs.push_back(t);
-                    winIdxs.push_back(i);    
+        while(startIdx < s.size() and endIdx < s.size()) {
+            if(count) {
+                endIdx++;
+                
+                targetCount[s[endIdx]]--;
+                if(targetMatch[s[endIdx]] and targetCount[s[endIdx]] >= 0) {
+                    count--;
+                }
+            } else {
+                if(minIdx == -1 or minLen > endIdx-startIdx) {
+                    minIdx = startIdx;
+                    minLen = endIdx - startIdx;
                 }
 
-                eraseCharInWinStrs(i);
+                targetCount[s[startIdx]]++;
+                if(targetMatch[s[startIdx]] and targetCount[s[startIdx]] > 0) {
+                    count++;
+                }
+
+                startIdx++;
             }
         }
 
-        return minWinStr;
+        return s.substr(minIdx, minLen);
     }
 };
